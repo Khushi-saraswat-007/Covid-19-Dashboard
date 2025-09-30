@@ -18,8 +18,11 @@ gender_options = st.sidebar.multiselect("Select Gender", options=['Male','Female
 patient_type_options = st.sidebar.multiselect(
     "Select Patient Type", df['PATIENT_TYPE'].unique(), default=df['PATIENT_TYPE'].unique()
 )
+
+# Comorbidities (only filter if they exist in dataset)
 comorbidities = ['DIABETES', 'HYPERTENSION', 'OBESITY']
-selected_comorbidities = st.sidebar.multiselect("Select Comorbidities", options=comorbidities, default=comorbidities)
+available_comorbidities = [c for c in comorbidities if c in df.columns]
+selected_comorbidities = st.sidebar.multiselect("Select Comorbidities", options=available_comorbidities, default=available_comorbidities)
 
 # Map gender to numeric
 gender_map = {'Male':0, 'Female':1}
@@ -28,14 +31,17 @@ gender_map = {'Male':0, 'Female':1}
 df_filtered = df[(df['AGE'] >= age_range[0]) & (df['AGE'] <= age_range[1])]
 df_filtered = df_filtered[df_filtered['SEX'].isin([gender_map[g] for g in gender_options])]
 df_filtered = df_filtered[df_filtered['PATIENT_TYPE'].isin(patient_type_options)]
+
+# Filter by selected comorbidities safely
 for c in selected_comorbidities:
-    df_filtered = df_filtered[df_filtered[c].notna()]
+    if c in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered[c].notna()]
 
 # Top metrics
 total_patients = df_filtered.shape[0]
 total_deaths = df_filtered['DATE_DIED'].notna().sum()
-avg_age = df_filtered['AGE'].mean()
-median_age = df_filtered['AGE'].median()
+avg_age = df_filtered['AGE'].mean() if total_patients > 0 else 0
+median_age = df_filtered['AGE'].median() if total_patients > 0 else 0
 death_rate = (total_deaths / total_patients * 100) if total_patients>0 else 0
 
 col1, col2, col3, col4 = st.columns(4)
@@ -61,7 +67,8 @@ with tab1:
         ax.set_ylabel("Count")
         ax.set_title("Age Distribution")
         st.pyplot(fig)
-        st.write(f"Most patients are around age {df_filtered['AGE'].mode()[0]}.")
+        if total_patients > 0:
+            st.write(f"Most patients are around age {df_filtered['AGE'].mode()[0]}.")
 
     with col2:
         fig, ax = plt.subplots()
@@ -83,11 +90,12 @@ with tab1:
 
 # ===== Tab 2: Health Features =====
 with tab2:
-    st.subheader("Age vs Diabetes Condition")
-    fig, ax = plt.subplots()
-    sns.scatterplot(x="AGE", y="DIABETES", data=df_filtered, alpha=0.3, ax=ax)
-    ax.set_title("Age vs Diabetes")
-    st.pyplot(fig)
+    if 'DIABETES' in df_filtered.columns:
+        st.subheader("Age vs Diabetes Condition")
+        fig, ax = plt.subplots()
+        sns.scatterplot(x="AGE", y="DIABETES", data=df_filtered, alpha=0.3, ax=ax)
+        ax.set_title("Age vs Diabetes")
+        st.pyplot(fig)
 
     st.subheader("Boxplot: Age by Patient Type")
     fig, ax = plt.subplots()
@@ -141,5 +149,5 @@ with tab4:
     st.write(f"- Total Deaths: {total_deaths}")
     st.write(f"- Death Rate: {death_rate:.2f}%")
     st.write(f"- Median Age: {median_age}")
-    st.write("- Most common comorbidities in selected filters: " +
-             ", ".join(selected_comorbidities))
+    if available_comorbidities:
+        st.write("- Most common comorbidities in selected filters: " + ", ".join(selected_comorbidities))
