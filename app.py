@@ -61,36 +61,48 @@ with tab1:
     col1, col2 = st.columns(2)
 
     with col1:
-        fig, ax = plt.subplots()
-        ax.hist(df_filtered['AGE'], bins=30, color="skyblue")
-        ax.set_xlabel("Age")
-        ax.set_ylabel("Count")
-        ax.set_title("Age Distribution")
-        st.pyplot(fig)
-        if total_patients > 0:
+        if not df_filtered.empty:
+            fig, ax = plt.subplots()
+            ax.hist(df_filtered['AGE'], bins=30, color="skyblue")
+            ax.set_xlabel("Age")
+            ax.set_ylabel("Count")
+            ax.set_title("Age Distribution")
+            st.pyplot(fig)
             st.write(f"Most patients are around age {df_filtered['AGE'].mode()[0]}.")
+        else:
+            st.write("No data available for selected filters.")
 
     with col2:
-        fig, ax = plt.subplots()
-        sns.countplot(x="SEX", data=df_filtered, palette="viridis", ax=ax)
-        ax.set_xticks([0,1])
-        ax.set_xticklabels(["Male","Female"])
-        ax.set_title("Gender Distribution")
-        st.pyplot(fig)
-        st.write(f"Gender distribution: {df_filtered['SEX'].value_counts().to_dict()} (0=Male, 1=Female)")
+        if not df_filtered.empty and 'SEX' in df_filtered.columns:
+            fig, ax = plt.subplots()
+            sns.countplot(x="SEX", data=df_filtered, palette="viridis", ax=ax)
+            ax.set_xticks([0,1])
+            ax.set_xticklabels(["Male","Female"])
+            ax.set_title("Gender Distribution")
+            st.pyplot(fig)
+            st.write(f"Gender distribution: {df_filtered['SEX'].value_counts().to_dict()} (0=Male, 1=Female)")
+        else:
+            st.write("No data available for selected filters.")
 
     # Stacked bar for patient type vs gender
     st.subheader("Patient Type by Gender")
-    patient_gender = pd.crosstab(df_filtered['PATIENT_TYPE'], df_filtered['SEX'])
-    patient_gender.plot(kind='bar', stacked=True, figsize=(8,4), colormap='Set2')
-    plt.xlabel("Patient Type")
-    plt.ylabel("Count")
-    plt.title("Stacked Bar: Patient Type by Gender")
-    st.pyplot(plt.gcf())
+    if not df_filtered.empty and 'SEX' in df_filtered.columns and 'PATIENT_TYPE' in df_filtered.columns:
+        patient_gender = pd.crosstab(df_filtered['PATIENT_TYPE'], df_filtered['SEX'])
+        if not patient_gender.empty:
+            fig, ax = plt.subplots(figsize=(8,4))
+            patient_gender.plot(kind='bar', stacked=True, colormap='Set2', ax=ax)
+            ax.set_xlabel("Patient Type")
+            ax.set_ylabel("Count")
+            ax.set_title("Stacked Bar: Patient Type by Gender")
+            st.pyplot(fig)
+        else:
+            st.write("No data available for selected filters to plot Patient Type by Gender.")
+    else:
+        st.write("No data available for selected filters to plot Patient Type by Gender.")
 
 # ===== Tab 2: Health Features =====
 with tab2:
-    if 'DIABETES' in df_filtered.columns:
+    if 'DIABETES' in df_filtered.columns and not df_filtered.empty:
         st.subheader("Age vs Diabetes Condition")
         fig, ax = plt.subplots()
         sns.scatterplot(x="AGE", y="DIABETES", data=df_filtered, alpha=0.3, ax=ax)
@@ -98,51 +110,63 @@ with tab2:
         st.pyplot(fig)
 
     st.subheader("Boxplot: Age by Patient Type")
-    fig, ax = plt.subplots()
-    sns.boxplot(x="PATIENT_TYPE", y="AGE", data=df_filtered, palette="Set2", ax=ax)
-    st.pyplot(fig)
+    if not df_filtered.empty:
+        fig, ax = plt.subplots()
+        sns.boxplot(x="PATIENT_TYPE", y="AGE", data=df_filtered, palette="Set2", ax=ax)
+        st.pyplot(fig)
+    else:
+        st.write("No data available for boxplot.")
 
     st.subheader("Correlation Heatmap of Health Features")
-    corr = df_filtered.select_dtypes('number').corr()
-    fig, ax = plt.subplots(figsize=(8,5))
-    sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
-    st.pyplot(fig)
+    if not df_filtered.empty:
+        corr = df_filtered.select_dtypes('number').corr()
+        fig, ax = plt.subplots(figsize=(8,5))
+        sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
+        st.pyplot(fig)
+    else:
+        st.write("No data available for correlation heatmap.")
 
 # ===== Tab 3: Death & Recovery =====
 with tab3:
     st.subheader("Death Trend Over Time")
-    death_trend = df_filtered['DATE_DIED'].value_counts().sort_index()
-    fig, ax = plt.subplots(figsize=(8,4))
-    death_trend.plot(ax=ax)
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Number of Deaths")
-    ax.set_title("COVID-19 Deaths Over Time")
-    st.pyplot(fig)
+    if not df_filtered.empty and 'DATE_DIED' in df_filtered.columns:
+        death_trend = df_filtered['DATE_DIED'].value_counts().sort_index()
+        fig, ax = plt.subplots(figsize=(8,4))
+        death_trend.plot(ax=ax)
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Number of Deaths")
+        ax.set_title("COVID-19 Deaths Over Time")
+        st.pyplot(fig)
 
-    st.subheader("Misleading vs Corrected Death Trend")
-    col1, col2 = st.columns(2)
-    with col1:
-        fig, ax = plt.subplots(figsize=(6,4))
-        death_trend.plot(ax=ax)
-        ax.set_ylim(200, 500)
-        ax.set_title("Misleading Death Trend")
-        st.pyplot(fig)
-    with col2:
-        fig, ax = plt.subplots(figsize=(6,4))
-        death_trend.plot(ax=ax)
-        ax.set_ylim(0, death_trend.max())
-        ax.set_title("Correct Death Trend")
-        st.pyplot(fig)
+        st.subheader("Misleading vs Corrected Death Trend")
+        col1, col2 = st.columns(2)
+        with col1:
+            fig, ax = plt.subplots(figsize=(6,4))
+            death_trend.plot(ax=ax)
+            ax.set_ylim(200, 500)
+            ax.set_title("Misleading Death Trend")
+            st.pyplot(fig)
+        with col2:
+            fig, ax = plt.subplots(figsize=(6,4))
+            death_trend.plot(ax=ax)
+            ax.set_ylim(0, death_trend.max())
+            ax.set_title("Correct Death Trend")
+            st.pyplot(fig)
+    else:
+        st.write("No death data available for selected filters.")
 
 # ===== Tab 4: Insights =====
 with tab4:
     st.subheader("Filtered Data Download")
-    st.download_button(
-        label="Download Filtered Data",
-        data=df_filtered.to_csv(index=False),
-        file_name="filtered_covid_data.csv",
-        mime="text/csv"
-    )
+    if not df_filtered.empty:
+        st.download_button(
+            label="Download Filtered Data",
+            data=df_filtered.to_csv(index=False),
+            file_name="filtered_covid_data.csv",
+            mime="text/csv"
+        )
+    else:
+        st.write("No data available to download.")
 
     st.write("**Key Observations:**")
     st.write(f"- Total Patients: {total_patients}")
