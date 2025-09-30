@@ -14,7 +14,6 @@ df['DATE_DIED'] = pd.to_datetime(df['DATE_DIED'], errors='coerce')
 # Sidebar filters
 st.sidebar.header("Filters")
 age_range = st.sidebar.slider("Select Age Range", 0, 120, (0, 120))
-gender_options = st.sidebar.multiselect("Select Gender", options=['Male','Female'], default=['Male','Female'])
 patient_type_options = st.sidebar.multiselect(
     "Select Patient Type", df['PATIENT_TYPE'].unique(), default=df['PATIENT_TYPE'].unique()
 )
@@ -24,12 +23,8 @@ comorbidities = ['DIABETES', 'HYPERTENSION', 'OBESITY']
 available_comorbidities = [c for c in comorbidities if c in df.columns]
 selected_comorbidities = st.sidebar.multiselect("Select Comorbidities", options=available_comorbidities, default=available_comorbidities)
 
-# Map gender to numeric
-gender_map = {'Male':0, 'Female':1}
-
 # Filter dataframe
 df_filtered = df[(df['AGE'] >= age_range[0]) & (df['AGE'] <= age_range[1])]
-df_filtered = df_filtered[df_filtered['SEX'].isin([gender_map[g] for g in gender_options])]
 df_filtered = df_filtered[df_filtered['PATIENT_TYPE'].isin(patient_type_options)]
 
 # Filter by selected comorbidities safely
@@ -57,48 +52,30 @@ tab1, tab2, tab3, tab4 = st.tabs(["Demographics", "Health Features", "Death & Re
 
 # ===== Tab 1: Demographics =====
 with tab1:
-    st.subheader("Age & Gender Distribution")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if not df_filtered.empty:
-            fig, ax = plt.subplots()
-            ax.hist(df_filtered['AGE'], bins=30, color="skyblue")
-            ax.set_xlabel("Age")
-            ax.set_ylabel("Count")
-            ax.set_title("Age Distribution")
-            st.pyplot(fig)
-            st.write(f"Most patients are around age {df_filtered['AGE'].mode()[0]}.")
-        else:
-            st.write("No data available for selected filters.")
-
-    with col2:
-        if not df_filtered.empty and 'SEX' in df_filtered.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(x="SEX", data=df_filtered, palette="viridis", ax=ax)
-            ax.set_xticks([0,1])
-            ax.set_xticklabels(["Male","Female"])
-            ax.set_title("Gender Distribution")
-            st.pyplot(fig)
-            st.write(f"Gender distribution: {df_filtered['SEX'].value_counts().to_dict()} (0=Male, 1=Female)")
-        else:
-            st.write("No data available for selected filters.")
-
-    # Stacked bar for patient type vs gender
-    st.subheader("Patient Type by Gender")
-    if not df_filtered.empty and 'SEX' in df_filtered.columns and 'PATIENT_TYPE' in df_filtered.columns:
-        patient_gender = pd.crosstab(df_filtered['PATIENT_TYPE'], df_filtered['SEX'])
-        if not patient_gender.empty:
-            fig, ax = plt.subplots(figsize=(8,4))
-            patient_gender.plot(kind='bar', stacked=True, colormap='Set2', ax=ax)
-            ax.set_xlabel("Patient Type")
-            ax.set_ylabel("Count")
-            ax.set_title("Stacked Bar: Patient Type by Gender")
-            st.pyplot(fig)
-        else:
-            st.write("No data available for selected filters to plot Patient Type by Gender.")
+    st.subheader("Age Distribution")
+    if not df_filtered.empty:
+        fig, ax = plt.subplots()
+        ax.hist(df_filtered['AGE'], bins=30, color="skyblue")
+        ax.set_xlabel("Age")
+        ax.set_ylabel("Count")
+        ax.set_title("Age Distribution")
+        st.pyplot(fig)
+        st.write(f"Most patients are around age {df_filtered['AGE'].mode()[0]}.")
     else:
-        st.write("No data available for selected filters to plot Patient Type by Gender.")
+        st.write("No data available for selected filters.")
+
+    # Stacked bar for patient type
+    st.subheader("Patient Type Distribution")
+    if not df_filtered.empty and 'PATIENT_TYPE' in df_filtered.columns:
+        patient_count = df_filtered['PATIENT_TYPE'].value_counts()
+        fig, ax = plt.subplots(figsize=(8,4))
+        patient_count.plot(kind='bar', color='skyblue', ax=ax)
+        ax.set_xlabel("Patient Type")
+        ax.set_ylabel("Count")
+        ax.set_title("Patient Type Distribution")
+        st.pyplot(fig)
+    else:
+        st.write("No data available for selected filters.")
 
 # ===== Tab 2: Health Features =====
 with tab2:
