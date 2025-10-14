@@ -17,60 +17,77 @@ st.markdown("""
 <style>
 /* ---- General App Styling ---- */
 body, .main, .block-container {
-    background-color: white !important;
-    color: black !important;
+    background-color: black !important;
+    color: white !important;
 }
 
 /* ---- Sidebar ---- */
 .css-1d391kg, [data-testid="stSidebar"], .stSidebar, .sidebar-content {
-    background-color: white !important;
-    color: black !important;
+    background-color: black !important;
+    color: white !important;
 }
 
 /* ---- Headers ---- */
 h1, h2, h3, h4, h5, h6 {
-    color: black !important;
+    color: white !important;
 }
 
 /* ---- Markdown, Labels, Paragraphs ---- */
 p, span, div, label, .stMarkdown, .css-q8sbsg, .css-1cpxqw2 {
-    color: black !important;
+    color: white !important;
 }
 
 /* ---- Metric Labels ---- */
 .stMetric label {
     font-size: 16px;
-    color: black !important;
+    color: white !important;
 }
 
 /* ---- Metric Values ---- */
 [data-testid="stMetricValue"] {
-    color: black !important;
+    color: white !important;
 }
 
 /* ---- Sidebar Text ---- */
 [data-testid="stSidebar"] * {
-    color: black !important;
+    color: white !important;
 }
 
 /* ---- Plotly Hover Text ---- */
 .js-plotly-plot text, .plotly .hoverlayer text {
-    fill: black !important;
+    fill: white !important;
 }
 
 /* ---- Input Widgets ---- */
 input, select, textarea {
-    color: black !important;
-    background-color: white !important;
+    color: white !important;
+    background-color: #111 !important;
+    border: 1px solid #444 !important;
+}
+
+/* ---- Buttons ---- */
+.stButton>button {
+    background-color: #222 !important;
+    color: white !important;
+    border: 1px solid #555 !important;
+    border-radius: 8px !important;
+}
+.stButton>button:hover {
+    background-color: #333 !important;
+}
+
+/* ---- Divider and Markdown Lines ---- */
+hr {
+    border: 1px solid #555 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-#  HEADER 
-st.title(" Global COVID-19 Data Dashboard")
+# ---------------------- HEADER ----------------------
+st.title("🌍 Global COVID-19 Data Dashboard")
 
-# LOAD DATA 
+# ---------------------- LOAD DATA ----------------------
 try:
     df = pd.read_csv("country_wise_latest.csv")
 except FileNotFoundError:
@@ -81,16 +98,15 @@ except FileNotFoundError:
     else:
         st.stop()
 
-# Clean column names
 df.columns = [c.strip() for c in df.columns]
 
-#  SIDEBAR FILTERS 
+# ---------------------- SIDEBAR FILTERS ----------------------
 st.sidebar.header("🔍 Filter Options")
 regions = df["WHO Region"].dropna().unique().tolist()
 selected_region = st.sidebar.multiselect("Select WHO Region(s):", regions, default=regions)
 filtered_df = df[df["WHO Region"].isin(selected_region)]
 
-#  METRICS 
+# ---------------------- METRICS ----------------------
 st.subheader("🌏 Global Overview")
 col1, col2, col3, col4 = st.columns(4)
 
@@ -103,7 +119,7 @@ col3.metric("Total Recovered", f"{safe_sum(filtered_df['Recovered']):,}")
 col4.metric("Total Active", f"{safe_sum(filtered_df['Active']):,}")
 st.markdown("---")
 
-# BAR CHARTS 
+# ---------------------- BAR CHARTS ----------------------
 st.subheader("📊 Top 15 Countries by Confirmed & Deaths")
 colA, colB = st.columns(2)
 
@@ -123,11 +139,11 @@ with colA:
         )
         fig1.update_layout(
             xaxis_tickformat=",",
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font_color="black",
-            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font_color="white",
+            xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+            yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
         )
         st.plotly_chart(fig1, use_container_width=True)
         st.markdown("**Insight:** These countries have the highest confirmed COVID-19 cases globally.")
@@ -150,11 +166,11 @@ with colB:
         )
         fig2.update_layout(
             xaxis_tickformat=",",
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font_color="black",
-            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font_color="white",
+            xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+            yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
         )
         st.plotly_chart(fig2, use_container_width=True)
         st.markdown("**Insight:** These countries have suffered the most fatalities.")
@@ -163,7 +179,7 @@ with colB:
 
 st.markdown("---")
 
-# SCATTER PLOT 
+# ---------------------- SCATTER PLOT ----------------------
 st.subheader("🧭 Recovered vs Active Cases ")
 if not filtered_df.empty:
     fig3 = px.scatter(
@@ -181,11 +197,11 @@ if not filtered_df.empty:
     fig3.update_layout(
         xaxis_tickformat=",",
         yaxis_tickformat=",",
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font_color="black",
-        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font_color="white",
+        xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+        yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
     )
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("**Insight:** Log scale helps visualize wide-ranging numbers; bubble size shows confirmed cases.")
@@ -194,7 +210,7 @@ else:
 
 st.markdown("---")
 
-#TREE MAP 
+# ---------------------- TREE MAP ----------------------
 st.subheader("🌳 Cases Distribution by Region and Country")
 if not filtered_df.empty:
     fig_tree = px.treemap(
@@ -205,7 +221,7 @@ if not filtered_df.empty:
         color_continuous_scale=px.colors.sequential.Reds,
         title="Tree Map: Confirmed Cases & Deaths"
     )
-    fig_tree.update_layout(paper_bgcolor="white", font_color="black")
+    fig_tree.update_layout(paper_bgcolor="black", font_color="white")
     st.plotly_chart(fig_tree, use_container_width=True)
     st.markdown("**Insight:** Visualizes region-wise contributions and severity by deaths.")
 else:
@@ -213,7 +229,7 @@ else:
 
 st.markdown("---")
 
-# BOX PLOT 
+# ---------------------- BOX PLOT ----------------------
 st.subheader("📦 Distribution of Deaths by Region")
 if not filtered_df.empty:
     fig_box = px.box(
@@ -224,10 +240,11 @@ if not filtered_df.empty:
         title="Box Plot: Deaths by WHO Region"
     )
     fig_box.update_layout(
-        paper_bgcolor="white",
-        font_color="black",
-        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font_color="white",
+        xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+        yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
     )
     st.plotly_chart(fig_box, use_container_width=True)
     st.markdown("**Insight:** Shows median, quartiles, and outliers for deaths by region.")
@@ -236,7 +253,7 @@ else:
 
 st.markdown("---")
 
-# PIE CHART 
+# ---------------------- PIE CHART ----------------------
 st.subheader("🥧 Share of Confirmed Cases by Region")
 if not filtered_df.empty:
     region_share = filtered_df.groupby("WHO Region")["Confirmed"].sum().reset_index()
@@ -247,7 +264,7 @@ if not filtered_df.empty:
         title="Pie Chart: Confirmed Cases Share by Region",
         color_discrete_sequence=px.colors.qualitative.Set3
     )
-    fig_pie.update_layout(paper_bgcolor="white", font_color="black")
+    fig_pie.update_layout(paper_bgcolor="black", font_color="white")
     st.plotly_chart(fig_pie, use_container_width=True)
     st.markdown("**Insight:** Highlights regions with majority of confirmed cases.")
 else:
@@ -255,14 +272,17 @@ else:
 
 st.markdown("---")
 
-#  CORRELATION HEATMAP 
+# ---------------------- CORRELATION HEATMAP ----------------------
 st.subheader("🔗 Correlation Between COVID Metrics")
 if not filtered_df.empty:
     num_cols = ["Confirmed", "Deaths", "Recovered", "Active"]
     corr = filtered_df[num_cols].corr()
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.heatmap(corr, annot=True, cmap="mako", fmt=".2f", linewidths=0.5)
-    fig.patch.set_facecolor('white')
+    fig.patch.set_facecolor('black')
+    ax.set_facecolor('black')
+    plt.xticks(color='white')
+    plt.yticks(color='white')
     st.pyplot(fig)
     st.markdown("**Insight:** Shows strong positive correlation between confirmed, deaths, and recovered metrics.")
 else:
@@ -270,7 +290,7 @@ else:
 
 st.markdown("---")
 
-# DISTRIBUTION 
+# ---------------------- DISTRIBUTION ----------------------
 st.subheader("📈 Distribution of Deaths per 100 Cases")
 if not filtered_df.empty:
     fig4 = px.histogram(
@@ -281,11 +301,11 @@ if not filtered_df.empty:
         title="Distribution: Deaths / 100 Cases"
     )
     fig4.update_layout(
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font_color="black",
-        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font_color="white",
+        xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+        yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
     )
     st.plotly_chart(fig4, use_container_width=True)
     st.markdown("**Insight:** Most countries cluster around low death rates, few outliers have high rates.")
@@ -308,11 +328,11 @@ if not filtered_df.empty:
         title="Average Cases & Deaths by WHO Region"
     )
     fig5.update_layout(
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font_color="black",
-        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black')),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'))
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font_color="white",
+        xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+        yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white'))
     )
     st.plotly_chart(fig5, use_container_width=True)
     st.markdown("**Insight:** Highlights differences in average cases and deaths across regions.")
@@ -321,6 +341,7 @@ else:
 
 st.markdown("---")
 
+# ---------------------- DOWNLOAD DATA ----------------------
 st.sidebar.header("⬇️ Download Data")
 csv = filtered_df.to_csv(index=False).encode('utf-8')
 st.sidebar.download_button("Download Filtered Data", csv, "filtered_covid_data.csv", "text/csv")
@@ -328,5 +349,5 @@ st.sidebar.download_button("Download Filtered Data", csv, "filtered_covid_data.c
 st.markdown("""
 ---
 **Dashboard designed by Khushi Saraswat**  
-*Data visualisation using Streamlit, Seaborn, and Plotly*
+*Data visualization using Streamlit, Seaborn, and Plotly*
 """)
