@@ -68,8 +68,7 @@ input, select, textarea {
 
 
 #  HEADER 
-st.title("🌸 Global COVID-19 Data Dashboard")
-st.markdown("#### A beautiful interactive visualization made by **Khushi Saraswat**")
+st.title(" Global COVID-19 Data Dashboard")
 
 # LOAD DATA 
 try:
@@ -165,7 +164,7 @@ with colB:
 st.markdown("---")
 
 # SCATTER PLOT 
-st.subheader("🧭 Recovered vs Active Cases (Interactive Scatter)")
+st.subheader("🧭 Recovered vs Active Cases ")
 if not filtered_df.empty:
     fig3 = px.scatter(
         filtered_df,
@@ -328,6 +327,6 @@ st.sidebar.download_button("Download Filtered Data", csv, "filtered_covid_data.c
 
 st.markdown("""
 ---
-🎨 **Dashboard designed by Khushi Saraswat**  
-💡 *Data visualisation using Streamlit, Seaborn, and Plotly*
+**Dashboard designed by Khushi Saraswat**  
+*Data visualisation using Streamlit, Seaborn, and Plotly*
 """)
