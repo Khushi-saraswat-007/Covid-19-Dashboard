@@ -15,28 +15,57 @@ st.set_page_config(
 # ---------------------- STYLE ----------------------
 st.markdown("""
 <style>
+/* ---- General App Styling ---- */
 body, .main, .block-container {
     background-color: white !important;
     color: black !important;
 }
-.css-1d391kg {  /* sidebar */
+
+/* ---- Sidebar ---- */
+.css-1d391kg, [data-testid="stSidebar"], .stSidebar, .sidebar-content {
     background-color: white !important;
     color: black !important;
 }
+
+/* ---- Headers ---- */
 h1, h2, h3, h4, h5, h6 {
     color: black !important;
 }
-/* Metric labels */
+
+/* ---- Markdown, Labels, Paragraphs ---- */
+p, span, div, label, .stMarkdown, .css-q8sbsg, .css-1cpxqw2 {
+    color: black !important;
+}
+
+/* ---- Metric Labels ---- */
 .stMetric label {
     font-size: 16px;
     color: black !important;
 }
-/* Metric values */
+
+/* ---- Metric Values ---- */
 [data-testid="stMetricValue"] {
     color: black !important;
 }
+
+/* ---- Sidebar Text ---- */
+[data-testid="stSidebar"] * {
+    color: black !important;
+}
+
+/* ---- Plotly Hover Text ---- */
+.js-plotly-plot text, .plotly .hoverlayer text {
+    fill: black !important;
+}
+
+/* ---- Input Widgets ---- */
+input, select, textarea {
+    color: black !important;
+    background-color: white !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 #  HEADER 
 st.title("🌸 Global COVID-19 Data Dashboard")
